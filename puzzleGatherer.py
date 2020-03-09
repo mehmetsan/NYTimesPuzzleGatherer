@@ -12,7 +12,7 @@ import time
 import os
 
 #INITIALIZING A CHROME DRIVER
-driver = webdriver.Chrome("C:\\webdrivers\\chromedriver.exe")
+driver = webdriver.Chrome()
 driver.get("https://www.nytimes.com/crosswords/game/mini")
 time.sleep(7)
 
