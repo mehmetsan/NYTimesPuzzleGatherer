@@ -9,6 +9,7 @@ import os
 
 #INITIALIZING A CHROME DRIVER
 driver = webdriver.Chrome()
+driver.maximize_window()
 driver.get("https://www.nytimes.com/crosswords/game/mini")
 time.sleep(7)
 
@@ -139,7 +140,7 @@ for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CO
         else:                       #NORMAL SQUARES WITHOUT LITTLE NUMBERS
             inserted = "<g><rect x="+str(X)+" y="+str(Y)+" width=10 height=10 style=\"fill:white;opacity:0.5\" />\" /> <text x="+str(X+3)+" y="+str(Y+6)+" font-size = 5 >"+each+"</text> </g>"
 
-    if(index % 7 == 0):             #CALCULATE NEXT SQUARE COORDINATES (VERTICAL)
+    if(index % 5 == 0):             #CALCULATE NEXT SQUARE COORDINATES (VERTICAL)
             X = 50
             Y += 11
     else:                           #CALCULATE NEXT SQUARE COORDINATES (HORIZONTAL)
@@ -152,7 +153,9 @@ for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CO
     driver.execute_script(script, element, inserted)
 
 
-#RECONSTRUCTING CLUES
+####################################
+#------RECONSTRUCTING CLUES--------#
+####################################
 
 #ADD EACH ONE OF THE COLLECTED ACROSS CLUES
 element =  driver.find_element_by_id("acrossClues")
@@ -192,6 +195,7 @@ script = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
 driver.execute_script(script, title, date)
 
 fileName = date.replace('/',"-")
-f=open(fileName+".html","w+")
+path = os.getcwd()+"\\storedPuzzles\\"
+f=open(path+fileName+".html","w+")
 f.write(driver.page_source)
 f.close()
