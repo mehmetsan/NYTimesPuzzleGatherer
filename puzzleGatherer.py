@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import time
 import os
+import requests
 
 #INITIALIZING A CHROME DRIVER
 driver = webdriver.Chrome()
@@ -20,7 +21,7 @@ time.sleep(1)
 
 #GET THE PAGE CONTENTS
 html = driver.page_source
-soup = BeautifulSoup(html,"html.parser")
+soup = BeautifulSoup(html,"html.parser",'features="lxml"')
 
 #FINDING THE DATACELLS (BOXES)
 group = soup.find ('g', {'data-group' : 'cells'})
@@ -90,7 +91,7 @@ chain.send_keys(Keys.ESCAPE).perform()
 
 #GET THE NEW CONTENTS, UPDATE THE SOUP WITH THE REVEALED STATE
 html = driver.page_source
-soup = BeautifulSoup(html,"html.parser")
+soup = BeautifulSoup(html,"html.parser",'features="lxml"')
 
 letters = []
 group = soup.find ('g', {'data-group' : 'cells'})
@@ -229,3 +230,26 @@ for x in range(5):
                 check = False
             answer += letters[co*y+x]
     rowAnswers.append((index,answer))
+
+
+#### DICTIONARY PART
+
+from PyDictionary import PyDictionary
+
+dictionary=PyDictionary()
+
+print (dictionary.meaning("AMORE"))
+
+rowDifferent = []
+for each in rowAnswers:
+    print(each[1])
+    if(dictionary.meaning(each[1])):
+        rowDifferent.append((each[1],dictionary.meaning(each[1])))
+
+colDifferent = []
+for each in colAnswers:
+    colDifferent.append( dictionary.meaning(each[1]) )
+
+
+
+dictionary.synonym("Life")
