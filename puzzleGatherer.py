@@ -199,3 +199,33 @@ path = os.getcwd()+"\\storedPuzzles\\"
 f=open(path+fileName+".html","w+")
 f.write(driver.page_source)
 f.close()
+
+###NEW PART
+rowAnswers = []
+
+for x in range(5):
+    co = 5
+    answer = ""
+    check = True
+    index = -1
+    for y in range(5):
+        if(letters[co*x+y] != "BLACK"):
+            if(check):
+                index = co*x +y
+                check = False
+            answer += letters[co*x+y]
+    rowAnswers.append((index,answer))
+
+colAnswers = []
+for x in range(5):
+    co = 5
+    answer = ""
+    check = True
+    index = -1
+    for y in range(5):
+        if(letters[co*y+x] != "BLACK"):
+            if(check):
+                index = co*y+x
+                check = False
+            answer += letters[co*y+x]
+    rowAnswers.append((index,answer))
