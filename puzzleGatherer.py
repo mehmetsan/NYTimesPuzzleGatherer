@@ -201,9 +201,9 @@ f=open(path+fileName+".html","w+")
 f.write(driver.page_source)
 f.close()
 
-###NEW PART
-rowAnswers = []
+###STORING ANSWERS IN (INDEX, ANSWER) PAIRS
 
+rowAnswers = []
 for x in range(5):
     co = 5
     answer = ""
@@ -232,13 +232,11 @@ for x in range(5):
     colAnswers.append((index,answer))
 
 
-#### DICTIONARY PART ####
+#### PYDICTIONARY PART ####
 
 from PyDictionary import PyDictionary
 
 dictionary=PyDictionary()
-
-print (dictionary.meaning("AMORE"))
 
 rowDifferent = []
 for each in rowAnswers:
