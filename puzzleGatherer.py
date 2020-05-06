@@ -234,7 +234,7 @@ for x in range(5):
 
 
 #### PYDICTIONARY PART ####
-
+'''
 from PyDictionary import PyDictionary
 
 dictionary=PyDictionary()
@@ -250,40 +250,37 @@ for each in colAnswers:
     print(each[1])
     if(dictionary.meaning(each[1])):
         colDifferent.append((each[1],dictionary.meaning(each[1])))
-
+'''
 
 #### WORDNET SITE PART ####
 
 wnRowResults = []
+mrRowResults = []
+dcRowResults = []
+
 for each in rowAnswers:
-    wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + each[1]
-    html_content    = requests.get(wordnetURL).text
-    soup            = BeautifulSoup(html_content,"html.parser")
-    defComponents   = soup.find_all("li")
+    wordnetResult   = m.tryWordnet(each[1])
+    merriamResult   = m.tryMerriam(each[1])
+    trasnlation     = m.translate(each[1])
 
-    defs = []
-    for word in defComponents:
-        index1  = word.text.rfind('(') + 1
-        index2  = word.text.rindex(')')
-        ans     = word.text[index1:index2]
-        defs.append(ans)
-
-    wnRowResults.append((each[1], defs))
+    wnRowResults.append((each[1],wordnetResult))
+    mrRowResults.append((each[1],merriamResult))
+    dcRowResults.append((each[1],trasnlation))
 
 wnColResults = []
+mrColResults = []
+dcColResults = []
+
 for each in colAnswers:
-    wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + each[1]
-    html_content    = requests.get(wordnetURL).text
-    soup            = BeautifulSoup(html_content,"html.parser")
-    defComponents   = soup.find_all("li")
+    wordnetResult   = m.tryWordnet(each[1])
+    merriamResult   = m.tryMerriam(each[1])
+    trasnlation     = m.translate(each[1])
 
-    defs = []
-    for word in defComponents:
-        index1  = word.text.rfind('(') + 1
-        index2  = word.text.rindex(')')
-        ans     = word.text[index1:index2]
-        defs.append(ans)
+    wnColResults.append((each[1],wordnetResult))
+    mrColResults.append((each[1],merriamResult))
+    dcColResults.append((each[1],trasnlation))
 
-    wnColResults.append((each[1], defs))
+###
 
-m.translate("amore")
+rowClues = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
+colClues = m.decideResult(wnColResults,mrColResults,dcColResults)
