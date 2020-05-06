@@ -21,7 +21,7 @@ time.sleep(1)
 
 #GET THE PAGE CONTENTS
 html = driver.page_source
-soup = BeautifulSoup(html,"html.parser",'features="lxml"')
+soup = BeautifulSoup(html,"html.parser")
 
 #FINDING THE DATACELLS (BOXES)
 group = soup.find ('g', {'data-group' : 'cells'})
@@ -91,7 +91,7 @@ chain.send_keys(Keys.ESCAPE).perform()
 
 #GET THE NEW CONTENTS, UPDATE THE SOUP WITH THE REVEALED STATE
 html = driver.page_source
-soup = BeautifulSoup(html,"html.parser",'features="lxml"')
+soup = BeautifulSoup(html,"html.parser")
 
 letters = []
 group = soup.find ('g', {'data-group' : 'cells'})
@@ -229,10 +229,10 @@ for x in range(5):
                 index = co*y+x
                 check = False
             answer += letters[co*y+x]
-    rowAnswers.append((index,answer))
+    colAnswers.append((index,answer))
 
 
-#### DICTIONARY PART
+#### DICTIONARY PART ####
 
 from PyDictionary import PyDictionary
 
@@ -248,8 +248,25 @@ for each in rowAnswers:
 
 colDifferent = []
 for each in colAnswers:
-    colDifferent.append( dictionary.meaning(each[1]) )
+    print(each[1])
+    if(dictionary.meaning(each[1])):
+        colDifferent.append((each[1],dictionary.meaning(each[1])))
 
 
+#### WORDNET SITE PART ####
 
-dictionary.synonym("Life")
+wnRowResults = []
+for each in rowAnswers:
+    wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + each[1]
+    html_content    = requests.get(wordnetURL).text
+    soup            = BeautifulSoup(html_content,"html.parser")
+    defComponents   = soup.find_all("li")
+
+    defs = []
+    for word in defComponents:
+        index1  = word.text.rfind('(') + 1
+        index2  = word.text.rindex(')')
+        ans     = word.text[index1:index2]
+        defs.append(ans)
+
+    wnRowResults.append((each[1], defs))
