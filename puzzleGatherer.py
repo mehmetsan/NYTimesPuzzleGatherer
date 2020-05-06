@@ -111,9 +111,114 @@ for each in groups:
         letters.append(letter)                      #STORE THE LETTER
 
 
-#------------------------------------------------------------------------
-#RECONSTRUCTING PUZZLE
-#------------------------------------------------------------------------
+
+####################################
+#-------NEW CLUE GENERATION--------#
+####################################
+
+
+###STORING ANSWERS IN (INDEX, ANSWER) PAIRS
+rowAnswers = []
+for x in range(5):
+    first = True
+    litNo = -1
+    co = 5
+    answer = ""
+    check = True
+    index = -1
+    for y in range(5):
+        if(letters[co*x+y] != "BLACK"):
+            if(first):
+                first = False
+                for i in range(len(numbers)):
+                    if(numbers[i][1] == str(co*x+y) ):
+
+                        litNo = numbers[i][0]
+            if(check):
+                index = co*x +y
+                check = False
+            answer += letters[co*x+y]
+    rowAnswers.append((litNo,index,answer))
+
+colAnswers = []
+for x in range(5):
+    first = True
+    litNo = -1
+    co = 5
+    answer = ""
+    check = True
+    index = -1
+    for y in range(5):
+        if(letters[co*y+x] != "BLACK"):
+            if(first):
+                first = False
+                for i in range(len(numbers)):
+                    if(numbers[i][1] == str(co*y+x) ):
+                        litNo = numbers[i][0]
+
+            if(check):
+                index = co*y+x
+                check = False
+            answer += letters[co*y+x]
+    colAnswers.append((litNo,index,answer))
+
+
+#### PYDICTIONARY PART ####
+'''
+from PyDictionary import PyDictionary
+
+dictionary=PyDictionary()
+
+rowDifferent = []
+for each in rowAnswers:
+    print(each[1])
+    if(dictionary.meaning(each[1])):
+        rowDifferent.append((each[1],dictionary.meaning(each[1])))
+
+colDifferent = []
+for each in colAnswers:
+    print(each[1])
+    if(dictionary.meaning(each[1])):
+        colDifferent.append((each[1],dictionary.meaning(each[1])))
+'''
+
+#### WORDNET SITE PART ####
+
+
+wnRowResults = []
+mrRowResults = []
+dcRowResults = []
+
+#GET DEFINITIONS FOR ROW CLUES
+for each in rowAnswers:
+    wordnetResult   = m.tryWordnet(each[2])
+    merriamResult   = m.tryMerriam(each[2])
+    trasnlation     = m.translate(each[2])
+
+    wnRowResults.append((each[0],each[2],wordnetResult))
+    mrRowResults.append((each[0],each[2],merriamResult))
+    dcRowResults.append((each[0],each[2],trasnlation))
+
+wnColResults = []
+mrColResults = []
+dcColResults = []
+
+#GET DEFINITIONS FOR COL CLUES
+for each in colAnswers:
+    wordnetResult   = m.tryWordnet(each[2])
+    merriamResult   = m.tryMerriam(each[2])
+    trasnlation     = m.translate(each[2])
+
+    wnColResults.append((each[0],each[2],wordnetResult))
+    mrColResults.append((each[0],each[2],merriamResult))
+    dcColResults.append((each[0],each[2],trasnlation))
+
+
+###
+accrossClues = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
+downClues = m.decideResult(wnColResults,mrColResults,dcColResults)
+
+### REGENERATED PUZZLE ###
 time.sleep(5)
 path = os.getcwd() + "\\site.html"  #GET RELATIVE PATH
 driver.get(path)                    #OPEN RECONSTRUCT SITE
@@ -161,9 +266,10 @@ for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CO
 
 #ADD EACH ONE OF THE COLLECTED ACROSS CLUES
 element =  driver.find_element_by_id("acrossClues")
-for each in across:
-    clueNo  = each[0]
-    clue    = each[1]
+for i in range(len(across)):
+    clueNo  = across[i][0]
+    clue    = m.findCorrectClue(accrossClues, clueNo)
+    clue    = clue[0].upper() + clue[1:]
     inserted= "<div><text>"+clueNo + " " +clue+"</text></div>"
     script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
     driver.execute_script(script, element, inserted)
@@ -171,9 +277,10 @@ for each in across:
 
 #ADD EACH ONE OF THE COLLECTED DOWN CLUES
 element =  driver.find_element_by_id("downClues")
-for each in down:
-    clueNo  = each[0]
-    clue    = each[1]
+for i in range(len(down)):
+    clueNo  = down[i][0]
+    clue    = m.findCorrectClue(downClues, clueNo)
+    clue    = clue[0].upper() + clue[1:]
     inserted= "<div><text>"+clueNo + " " +clue+"</text></div>"
     script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
     driver.execute_script(script, element, inserted)
@@ -201,86 +308,3 @@ path = os.getcwd()+"\\storedPuzzles\\"
 f=open(path+fileName+".html","w+")
 f.write(driver.page_source)
 f.close()
-
-###STORING ANSWERS IN (INDEX, ANSWER) PAIRS
-
-rowAnswers = []
-for x in range(5):
-    co = 5
-    answer = ""
-    check = True
-    index = -1
-    for y in range(5):
-        if(letters[co*x+y] != "BLACK"):
-            if(check):
-                index = co*x +y
-                check = False
-            answer += letters[co*x+y]
-    rowAnswers.append((index,answer))
-
-colAnswers = []
-for x in range(5):
-    co = 5
-    answer = ""
-    check = True
-    index = -1
-    for y in range(5):
-        if(letters[co*y+x] != "BLACK"):
-            if(check):
-                index = co*y+x
-                check = False
-            answer += letters[co*y+x]
-    colAnswers.append((index,answer))
-
-
-#### PYDICTIONARY PART ####
-'''
-from PyDictionary import PyDictionary
-
-dictionary=PyDictionary()
-
-rowDifferent = []
-for each in rowAnswers:
-    print(each[1])
-    if(dictionary.meaning(each[1])):
-        rowDifferent.append((each[1],dictionary.meaning(each[1])))
-
-colDifferent = []
-for each in colAnswers:
-    print(each[1])
-    if(dictionary.meaning(each[1])):
-        colDifferent.append((each[1],dictionary.meaning(each[1])))
-'''
-
-#### WORDNET SITE PART ####
-
-wnRowResults = []
-mrRowResults = []
-dcRowResults = []
-
-for each in rowAnswers:
-    wordnetResult   = m.tryWordnet(each[1])
-    merriamResult   = m.tryMerriam(each[1])
-    trasnlation     = m.translate(each[1])
-
-    wnRowResults.append((each[1],wordnetResult))
-    mrRowResults.append((each[1],merriamResult))
-    dcRowResults.append((each[1],trasnlation))
-
-wnColResults = []
-mrColResults = []
-dcColResults = []
-
-for each in colAnswers:
-    wordnetResult   = m.tryWordnet(each[1])
-    merriamResult   = m.tryMerriam(each[1])
-    trasnlation     = m.translate(each[1])
-
-    wnColResults.append((each[1],wordnetResult))
-    mrColResults.append((each[1],merriamResult))
-    dcColResults.append((each[1],trasnlation))
-
-###
-
-rowClues = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
-colClues = m.decideResult(wnColResults,mrColResults,dcColResults)

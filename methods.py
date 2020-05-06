@@ -14,7 +14,7 @@ def tryWordnet( myWord ):
 
     defs = []
     for definition in defComponents:
-        temp = definition.text[6:]
+        temp    = definition.text[6:]
         index1  = temp.find('(') + 1
         index2  = temp.rindex(')')
         ans     = temp[index1:index2]
@@ -54,11 +54,16 @@ def translate( myWord ):
 def decideResult( wnResult, mrResult, dcResult):
     resList = []
     for i in range(len(wnResult)):
-        if(wnResult[i][1] != "NODEF"):
+        if(wnResult[i][2]   != "NODEF"):
             resList.append(wnResult[i])
-        elif(mrResult[i][1] != "NODEF"):
+        elif(mrResult[i][2] != "NODEF"):
             resList.append(mrResult[i])
         else:
             resList.append(dcResult[i])
 
     return resList
+def findCorrectClue( list, littleNumber ):
+
+    for i in range(len(list)):
+        if(list[i][0] == littleNumber):
+            return list[i][2]
