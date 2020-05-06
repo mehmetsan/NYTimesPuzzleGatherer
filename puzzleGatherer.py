@@ -7,6 +7,7 @@ from datetime import datetime
 import time
 import os
 import requests
+import methods as m
 
 #INITIALIZING A CHROME DRIVER
 driver = webdriver.Chrome()
@@ -284,3 +285,5 @@ for each in colAnswers:
         defs.append(ans)
 
     wnColResults.append((each[1], defs))
+
+m.translate("amore")
