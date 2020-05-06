@@ -5,6 +5,8 @@ from wordster import wordster
 import requests
 from bs4 import BeautifulSoup
 import pycountry
+from datetime import datetime
+import time
 
 def tryWordnet( myWord ):
     wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + myWord
@@ -45,12 +47,14 @@ def tryMerriam( myWord ):
         return "NODEF"
     return defs[0]      #RETURN FIRST MEANING
 
-def translate( myWord ):
+def translate( myWord, currentAns ):
     lan         = detect(myWord.lower()+" ")
     translator  = Translator(from_lang=lan, to_lang="en")
     translation = translator.translate(myWord.lower()+" ")
     lanName     = pycountry.languages.get(alpha_2=lan).name
 
+    if(lan == 'en'):    #IF THE WORD IS NOT A FOREIGN ONE, LEAVE IT AS IT IS
+        return currentAns
     return translation.lower() + " in " + lanName.upper()
 
 def decideResult( wnResult, mrResult, dcResult):
@@ -68,4 +72,13 @@ def findCorrectClue( list, littleNumber ):
 
     for i in range(len(list)):
         if(list[i][0] == littleNumber):
-            return list[i][2]
+            return list[i][-1]
+
+def pushLog( driver,logs, message ):
+    #GET THE CURRENT TIME
+    now     = datetime.now()
+    time    = now.strftime("%H:%M:%S")
+
+    inserted     = "<div><h2>"+message+ "\t\t\t\t\t///"+time+"</h2></div>"
+    script       = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+    driver.execute_script(script, logs, inserted)

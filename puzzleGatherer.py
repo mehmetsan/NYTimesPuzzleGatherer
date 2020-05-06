@@ -15,14 +15,25 @@ driver.maximize_window()
 driver.get("https://www.nytimes.com/crosswords/game/mini")
 time.sleep(7)
 
+
+# INITIALIZING DRIVER FOR LOG
+driver2     = webdriver.Chrome()
+path        = os.getcwd() + "\\log.html"    #GET RELATIVE PATH
+driver2.get(path)                           #OPEN RECONSTRUCT SITE
+logs        =  driver2.find_element_by_id("log")
+
+m.pushLog(driver2,logs,"Driver accessed the site")
+
 #CLOSE THE INITIAL POP-UP
 popUp = driver.find_element(By.XPATH, '//button[contains(.,\'OK\')]')
 popUp.click()
 time.sleep(1)
+m.pushLog(driver2,logs,"Closed the initial pop-up")
 
 #GET THE PAGE CONTENTS
 html = driver.page_source
 soup = BeautifulSoup(html,"html.parser")
+m.pushLog(driver2,logs,"Got the site contents")
 
 #FINDING THE DATACELLS (BOXES)
 group = soup.find ('g', {'data-group' : 'cells'})
@@ -49,7 +60,7 @@ for each in datas:
         else:
             littleNumber = each.find('text').get_text()
             numbers.append([littleNumber,boxId])    #ADD THE LITTLE NUMBER AND BOXID PAIR AS A LIST TO NUMBERS LIST
-
+m.pushLog(driver2,logs,"Located indexes of blacks, letters and little numbers")
 #GETTING THE CLUES
 clues   = soup.find('section', {'class' : 'Layout-clueLists--10_Xl'}).findAll("div")
 acr     = clues[0].find("ol").findAll("li") #LIST OF ACROSS CLUES SOUP OBJECT
@@ -71,6 +82,7 @@ for each in dwn:
     clue    = each.findAll("span")[1].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
     down.append([clueNo,clue])                           #ADD THE CLUE TO LIST
 
+m.pushLog(driver2,logs,"Stored across and down clues as lists")
 
 #LOCATING REVEAL BUTTON
 reveal = driver.find_element(By.XPATH, '//button[contains(.,\'reveal\')]')
@@ -84,15 +96,18 @@ puzzle.click()
 #APPROVE REVEAL
 reveal2 = driver.find_element(By.XPATH, '//span[contains(.,\'Reveal\')]')
 reveal2.click()
+m.pushLog(driver2,logs,"Approved to reveal the puzzle")
 
 #CLOSE THE POP-UP BY SENDING ESC KEY
 time.sleep(1)
 chain = ActionChains(driver)
 chain.send_keys(Keys.ESCAPE).perform()
+m.pushLog(driver2,logs,"Closed the pop-up")
 
 #GET THE NEW CONTENTS, UPDATE THE SOUP WITH THE REVEALED STATE
 html = driver.page_source
 soup = BeautifulSoup(html,"html.parser")
+m.pushLog(driver2,logs,"Updated the soup with the revealed state")
 
 letters = []
 group   = soup.find ('g', {'data-group' : 'cells'})
@@ -110,14 +125,14 @@ for each in groups:
         letter          = texts[lastTextIndex].get_text()    #SINCE LITTLE NUMBERS ARE IN THE FIRST TEXT TAG
         letters.append(letter)                      #STORE THE LETTER
 
-
+m.pushLog(driver2,logs,"Stored the revealed state letters")
 
 ####################################
 #-------NEW CLUE GENERATION--------#
 ####################################
 
 
-###STORING ANSWERS IN (INDEX, ANSWER) PAIRS
+###STORING ANSWERS IN (LITTLENO, INDEX, ANSWER) TRIPLETS
 rowAnswers = []
 for x in range(5):
     first = True
@@ -161,62 +176,51 @@ for x in range(5):
                 check = False
             answer += letters[co*y+x]
     colAnswers.append((litNo,index,answer))
+m.pushLog(driver2,logs,"Stored answer along with their start indexes")
 
-
-#### PYDICTIONARY PART ####
-'''
-from PyDictionary import PyDictionary
-
-dictionary=PyDictionary()
-
-rowDifferent = []
-for each in rowAnswers:
-    print(each[1])
-    if(dictionary.meaning(each[1])):
-        rowDifferent.append((each[1],dictionary.meaning(each[1])))
-
-colDifferent = []
-for each in colAnswers:
-    print(each[1])
-    if(dictionary.meaning(each[1])):
-        colDifferent.append((each[1],dictionary.meaning(each[1])))
-'''
-
-#### WORDNET SITE PART ####
-
+#### GETTING DEFINITIONS PART ####
 
 wnRowResults = []
 mrRowResults = []
 dcRowResults = []
 
-#GET DEFINITIONS FOR ROW CLUES
+# GET DEFINITIONS FOR ROW CLUES
 for each in rowAnswers:
+    currentAns      = m.findCorrectClue(across,each[0])
     wordnetResult   = m.tryWordnet(each[2])
     merriamResult   = m.tryMerriam(each[2])
-    trasnlation     = m.translate(each[2])
+    translation     = m.translate(each[2],currentAns)
 
     wnRowResults.append((each[0],each[2],wordnetResult))
     mrRowResults.append((each[0],each[2],merriamResult))
-    dcRowResults.append((each[0],each[2],trasnlation))
+    dcRowResults.append((each[0],each[2],translation))
 
 wnColResults = []
 mrColResults = []
 dcColResults = []
+m.pushLog(driver2,logs,"Gathered alternatives for 'Across' answers")
 
-#GET DEFINITIONS FOR COL CLUES
+
+# GET DEFINITIONS FOR COL CLUES
 for each in colAnswers:
+    currentAns      = m.findCorrectClue(down,each[0])
+    print(currentAns)
     wordnetResult   = m.tryWordnet(each[2])
     merriamResult   = m.tryMerriam(each[2])
-    trasnlation     = m.translate(each[2])
+    translation     = m.translate(each[2],currentAns)
 
     wnColResults.append((each[0],each[2],wordnetResult))
     mrColResults.append((each[0],each[2],merriamResult))
-    dcColResults.append((each[0],each[2],trasnlation))
+    dcColResults.append((each[0],each[2],translation))
 
+m.pushLog(driver2,logs,"Gathered alternatives for 'Down' answers")
 
-###
-accrossClues = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
-downClues = m.decideResult(wnColResults,mrColResults,dcColResults)
+# CHOOSE AND STORE THE GENERATED CLUES
+accrossClues    = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
+downClues       = m.decideResult(wnColResults,mrColResults,dcColResults)
+m.pushLog(driver2,logs,"Selected regenerated clues from various sources")
+m.pushLog(driver2,logs,"based on source priorities")
+
 
 ####################################
 #-------PUZZLE REGENERATION--------#
@@ -226,8 +230,8 @@ path = os.getcwd() + "\\site.html"  #GET RELATIVE PATH
 driver.get(path)                    #OPEN RECONSTRUCT SITE
 
 #INITIAL COORDINATES FOR THE RECONSTRUCTED TABLE
-X=50
-Y=0
+X=70
+Y=7
 index=1 #CURRENT BOX INDEX
 
 for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CORRECT POSITIONS
@@ -250,7 +254,7 @@ for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CO
             inserted = "<g><rect x="+str(X)+" y="+str(Y)+" width=10 height=10 style=\"fill:white;opacity:0.5\" />\" /> <text x="+str(X+3)+" y="+str(Y+6)+" font-size = 5 >"+each+"</text> </g>"
 
     if(index % 5 == 0):             #CALCULATE NEXT SQUARE COORDINATES (VERTICAL)
-            X = 50
+            X = 70
             Y += 11
     else:                           #CALCULATE NEXT SQUARE COORDINATES (HORIZONTAL)
         X += 11
@@ -261,32 +265,91 @@ for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CO
     script = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
     driver.execute_script(script, element, inserted)
 
+m.pushLog(driver2,logs,"Reconstructed the puzzle on custom site")
 
 ####################################
 #------RECONSTRUCTING CLUES--------#
 ####################################
 
-#ADD EACH ONE OF THE COLLECTED ACROSS CLUES
+#ADD EACH ONE OF THE ORIGINAL ACROSS CLUES
 element =  driver.find_element_by_id("acrossClues")
+inserted= "<div><text>"+"<b> ORIGINAL CLUES </b> "+"</text></div>"
+script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+driver.execute_script(script, element, inserted)
+
+for i in range(len(across)):
+    clueNo  = across[i][0]
+    if(len(down[i][1]) > 60):
+        part1 = "<div><text><b>"+clueNo + "</b> " +across[i][1][:60]+'_'+"</text></div>"
+        part2 = "<div><text>"+ "  " +across[i][1][60:]+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, part1)
+        driver.execute_script(script, element, part2)
+    else:
+        inserted= "<div><text><b>"+clueNo + "</b> " +across[i][1]+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, inserted)
+
+#ADD EACH ONE OF THE GENERATED ACROSS CLUES
+element =  driver.find_element_by_id("acrossClues")
+inserted= "<div><text>"+"<b> GENERATED CLUES </b>"+"</text></div>"
+script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+driver.execute_script(script, element, inserted)
 for i in range(len(across)):
     clueNo  = across[i][0]
     clue    = m.findCorrectClue(accrossClues, clueNo)
     clue    = clue[0].upper() + clue[1:]
-    inserted= "<div><text>"+clueNo + " " +clue+"</text></div>"
-    script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
-    driver.execute_script(script, element, inserted)
+    if(len(clue) > 60):
+        part1 = "<div><text><b>"+clueNo + "</b> " +clue[:60]+'_'+"</text></div>"
+        part2 = "<div><text>"+"  " +clue[60:]+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, part1)
+        driver.execute_script(script, element, part2)
+    else:
+        inserted= "<div><text><b>"+clueNo + "</b> " +clue+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, inserted)
 
 
-#ADD EACH ONE OF THE COLLECTED DOWN CLUES
+#ADD EACH ONE OF THE ORIGINAL DOWN CLUES
 element =  driver.find_element_by_id("downClues")
+inserted= "<div><text>"+"<b> ORIGINAL CLUES </b> "+"</text></div>"
+script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+driver.execute_script(script, element, inserted)
+for i in range(len(down)):
+    clueNo  = down[i][0]
+    if(len(down[i][1]) > 60):
+        part1 = "<div><text><b>"+clueNo + "</b> " +down[i][1][:60]+'_'+"</text></div>"
+        part2 = "<div><text>"+ "  " +down[i][1][60:]+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, part1)
+        driver.execute_script(script, element, part2)
+    else:
+        inserted= "<div><text><b>"+clueNo + "</b> " +down[i][1]+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, inserted)
+
+#ADD EACH ONE OF THE GENERATED DOWN CLUES
+element =  driver.find_element_by_id("downClues")
+inserted= "<div><text>"+"<b> GENERATED CLUES </b>"+"</text></div>"
+script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+driver.execute_script(script, element, inserted)
 for i in range(len(down)):
     clueNo  = down[i][0]
     clue    = m.findCorrectClue(downClues, clueNo)
     clue    = clue[0].upper() + clue[1:]
-    inserted= "<div><text>"+clueNo + " " +clue+"</text></div>"
-    script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
-    driver.execute_script(script, element, inserted)
+    if(len(clue) > 60):
+        part1 = "<div><text><b>"+clueNo + "</b> " +clue[:60]+'_'+"</text></div>"
+        part2 = "<div><text>"+ "  " +clue[60:]+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, part1)
+        driver.execute_script(script, element, part2)
+    else:
+        inserted= "<div><text><b>"+clueNo + "</b> " +clue+"</text></div>"
+        script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+        driver.execute_script(script, element, inserted)
 
+m.pushLog(driver2,logs,"Inserted new clues to the custom site")
 #GET THE CURRENT TIME
 now     = datetime.now()
 time    = now.strftime("%d/%m/%Y %H:%M:%S")
@@ -297,6 +360,7 @@ element     =  driver.find_element_by_id("board")
 inserted    = "<div id=\"group_name\"><h6>"+info+"</h6></div>"
 script      = "arguments[0].insertAdjacentHTML('afterend', arguments[1])"
 driver.execute_script(script, element, inserted)
+m.pushLog(driver2,logs,"Inserted group info to the custom site")
 
 #CHANGE THE TITLE AS THE CURRENT DATE
 title   = driver.find_element(By.XPATH, '//title')
@@ -310,3 +374,4 @@ path      = os.getcwd()+"\\storedPuzzles\\"
 f   = open(path+fileName+".html","w+")
 f.write(driver.page_source)
 f.close()
+m.pushLog(driver2,logs,"Saved the custom site")
