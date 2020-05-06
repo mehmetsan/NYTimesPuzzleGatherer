@@ -17,6 +17,8 @@ def tryWordnet( myWord ):
         temp    = definition.text[6:]
         index1  = temp.find('(') + 1
         index2  = temp.rindex(')')
+        if(';' in temp):
+            index2 = temp.find(';')
         ans     = temp[index1:index2]
         defs.append(ans)
 

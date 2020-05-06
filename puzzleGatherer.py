@@ -218,7 +218,9 @@ for each in colAnswers:
 accrossClues = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
 downClues = m.decideResult(wnColResults,mrColResults,dcColResults)
 
-### REGENERATED PUZZLE ###
+####################################
+#-------PUZZLE REGENERATION--------#
+####################################
 time.sleep(5)
 path = os.getcwd() + "\\site.html"  #GET RELATIVE PATH
 driver.get(path)                    #OPEN RECONSTRUCT SITE
@@ -291,8 +293,7 @@ time    = now.strftime("%d/%m/%Y %H:%M:%S")
 info    = "Date is : <b>" + time + "</b> Prepared by Group : <b>POWERPUFFGIRLS</b>"
 
 #INSERT GROUP INFO INTO CORRECT PLACE
-element =  driver.find_element_by_id("board")
-
+element     =  driver.find_element_by_id("board")
 inserted    = "<div id=\"group_name\"><h6>"+info+"</h6></div>"
 script      = "arguments[0].insertAdjacentHTML('afterend', arguments[1])"
 driver.execute_script(script, element, inserted)
@@ -303,8 +304,9 @@ date    = now.strftime("%d/%m/%Y")
 script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
 driver.execute_script(script, title, date)
 
-fileName = date.replace('/',"-")
-path = os.getcwd()+"\\storedPuzzles\\"
-f=open(path+fileName+".html","w+")
+#SAVE THE RESULT
+fileName  = date.replace('/',"-")
+path      = os.getcwd()+"\\storedPuzzles\\"
+f   = open(path+fileName+".html","w+")
 f.write(driver.page_source)
 f.close()
