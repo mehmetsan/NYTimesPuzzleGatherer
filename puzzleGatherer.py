@@ -28,8 +28,8 @@ group = soup.find ('g', {'data-group' : 'cells'})
 datas = group.findAll("g")
 
 #GETTING THE SCHEMA OF THE GRID
-blacks = []
-whites = []
+blacks  = []
+whites  = []
 numbers = []
 
 for each in datas:
@@ -50,24 +50,24 @@ for each in datas:
             numbers.append([littleNumber,boxId])    #ADD THE LITTLE NUMBER AND BOXID PAIR AS A LIST TO NUMBERS LIST
 
 #GETTING THE CLUES
-clues = soup.find('section', {'class' : 'Layout-clueLists--10_Xl'}).findAll("div")
-acr = clues[0].find("ol").findAll("li") #LIST OF ACROSS CLUES SOUP OBJECT
-dwn = clues[1].find("ol").findAll("li") #LIST OF DOWN CLUES SOUP OBJECT
+clues   = soup.find('section', {'class' : 'Layout-clueLists--10_Xl'}).findAll("div")
+acr     = clues[0].find("ol").findAll("li") #LIST OF ACROSS CLUES SOUP OBJECT
+dwn     = clues[1].find("ol").findAll("li") #LIST OF DOWN CLUES SOUP OBJECT
 
 #GETTING THE CLUES IN LIST FORMAT
-across = []
-down = []
+across  = []
+down    = []
 
 #CONVERTING THE SOUP ELEMENT INTO A LIST
 for each in acr:
-    clueNo = each.findAll("span")[0].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
-    clue = each.findAll("span")[1].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
+    clueNo  = each.findAll("span")[0].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
+    clue    = each.findAll("span")[1].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
     across.append([clueNo,clue])                         #ADD THE CLUE TO LIST
 
 #CONVERTING THE SOUP ELEMENT INTO A LIST
 for each in dwn:
-    clueNo = each.findAll("span")[0].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
-    clue = each.findAll("span")[1].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
+    clueNo  = each.findAll("span")[0].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
+    clue    = each.findAll("span")[1].get_text()   #THE PART WHERE THE TEXT OF THE CLUE IS STORED
     down.append([clueNo,clue])                           #ADD THE CLUE TO LIST
 
 
@@ -94,8 +94,8 @@ html = driver.page_source
 soup = BeautifulSoup(html,"html.parser")
 
 letters = []
-group = soup.find ('g', {'data-group' : 'cells'})
-groups = group.findAll("g")
+group   = soup.find ('g', {'data-group' : 'cells'})
+groups  = group.findAll("g")
 
 
 for each in groups:
@@ -105,8 +105,8 @@ for each in groups:
     else:                           #IF A WHITE SQUARE IS ENCOUNTERED
         texts = each.findAll("text")
 
-        lastTextIndex = len(texts) - 1              #NEED TO FIND THE LAST TEXT TAG, IN WHERE THE LETTER IS STORED
-        letter = texts[lastTextIndex].get_text()    #SINCE LITTLE NUMBERS ARE IN THE FIRST TEXT TAG
+        lastTextIndex   = len(texts) - 1              #NEED TO FIND THE LAST TEXT TAG, IN WHERE THE LETTER IS STORED
+        letter          = texts[lastTextIndex].get_text()    #SINCE LITTLE NUMBERS ARE IN THE FIRST TEXT TAG
         letters.append(letter)                      #STORE THE LETTER
 
 
@@ -161,38 +161,38 @@ for each in letters:                #FOR EACH COLLECTED LETTER, PLACE THEM IN CO
 #ADD EACH ONE OF THE COLLECTED ACROSS CLUES
 element =  driver.find_element_by_id("acrossClues")
 for each in across:
-    clueNo = each[0]
-    clue = each[1]
-    inserted = "<div><text>"+clueNo + " " +clue+"</text></div>"
-    script = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+    clueNo  = each[0]
+    clue    = each[1]
+    inserted= "<div><text>"+clueNo + " " +clue+"</text></div>"
+    script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
     driver.execute_script(script, element, inserted)
 
 
 #ADD EACH ONE OF THE COLLECTED DOWN CLUES
 element =  driver.find_element_by_id("downClues")
 for each in down:
-    clueNo = each[0]
-    clue = each[1]
-    inserted = "<div><text>"+clueNo + " " +clue+"</text></div>"
-    script = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+    clueNo  = each[0]
+    clue    = each[1]
+    inserted= "<div><text>"+clueNo + " " +clue+"</text></div>"
+    script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
     driver.execute_script(script, element, inserted)
 
 #GET THE CURRENT TIME
-now = datetime.now()
-time = now.strftime("%d/%m/%Y %H:%M:%S")
-info = "Date is : <b>" + time + "</b> Prepared by Group : <b>POWERPUFFGIRLS</b>"
+now     = datetime.now()
+time    = now.strftime("%d/%m/%Y %H:%M:%S")
+info    = "Date is : <b>" + time + "</b> Prepared by Group : <b>POWERPUFFGIRLS</b>"
 
 #INSERT GROUP INFO INTO CORRECT PLACE
 element =  driver.find_element_by_id("board")
 
-inserted = "<div id=\"group_name\"><h6>"+info+"</h6></div>"
-script = "arguments[0].insertAdjacentHTML('afterend', arguments[1])"
+inserted    = "<div id=\"group_name\"><h6>"+info+"</h6></div>"
+script      = "arguments[0].insertAdjacentHTML('afterend', arguments[1])"
 driver.execute_script(script, element, inserted)
 
 #CHANGE THE TITLE AS THE CURRENT DATE
-title = driver.find_element(By.XPATH, '//title')
-date = now.strftime("%d/%m/%Y")
-script = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+title   = driver.find_element(By.XPATH, '//title')
+date    = now.strftime("%d/%m/%Y")
+script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
 driver.execute_script(script, title, date)
 
 fileName = date.replace('/',"-")
@@ -270,3 +270,19 @@ for each in rowAnswers:
         defs.append(ans)
 
     wnRowResults.append((each[1], defs))
+
+wnColResults = []
+for each in colAnswers:
+    wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + each[1]
+    html_content    = requests.get(wordnetURL).text
+    soup            = BeautifulSoup(html_content,"html.parser")
+    defComponents   = soup.find_all("li")
+
+    defs = []
+    for word in defComponents:
+        index1  = word.text.rfind('(') + 1
+        index2  = word.text.rindex(')')
+        ans     = word.text[index1:index2]
+        defs.append(ans)
+
+    wnColResults.append((each[1], defs))
