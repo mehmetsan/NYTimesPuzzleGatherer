@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import pycountry
 from datetime import datetime
 import time
+import re
 
 def tryWordnet( myWord ):
     wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + myWord
@@ -19,9 +20,12 @@ def tryWordnet( myWord ):
         temp    = definition.text[6:]
         index1  = temp.find('(') + 1
         index2  = temp.rindex(')')
-        if(';' in temp):
-            index2 = temp.find(';')
         ans     = temp[index1:index2]
+        if(';' in ans):
+            index2 = ans.find(';')
+        ans     = ans[:index2]
+        while re.search(r"[(].*[)]", ans) != None:
+            ans = ans.replace(re.search(r"[(].*[)]", ans).group(), "")
         defs.append(ans)
 
     if(len(defs) == 0): #IF NO RESULTS ARE RETURNED
@@ -39,9 +43,15 @@ def tryMerriam( myWord ):
     for each in defComponents:
         whiteIndex = each.text.find("   ")
         if(whiteIndex == -1):
-            defs.append(each.text[2:])
+            ans = each.text[2:]
+            while re.search(r"[(].*[)]", ans) != None:
+                ans = ans.replace(re.search(r"[(].*[)]", ans).group(), "")
+            defs.append(ans)
         else:
-            defs.append(each.text[2:whiteIndex])
+            ans = each.text[2:whiteIndex]
+            while re.search(r"[(].*[)]", ans) != None:
+                ans = ans.replace(re.search(r"[(].*[)]", ans).group(), "")
+            defs.append(ans)
 
     if(len(defs) == 0): #IF NO RESULTS ARE RETURNED
         return "NODEF"
@@ -77,8 +87,8 @@ def findCorrectClue( list, littleNumber ):
 def pushLog( driver,logs, message ):
     #GET THE CURRENT TIME
     now     = datetime.now()
-    time    = now.strftime("%H:%M:%S")
+    time    = now.strftime("%H:%M:%S.%f")
 
-    inserted     = "<div><h2>"+message+ "\t\t\t\t\t///"+time+"</h2></div>"
+    inserted     = "<div><h3>"+message+ "\t\t\t\t\t///"+time+"</h3></div>"
     script       = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
     driver.execute_script(script, logs, inserted)

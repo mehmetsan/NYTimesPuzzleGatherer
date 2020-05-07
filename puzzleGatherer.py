@@ -280,8 +280,9 @@ driver.execute_script(script, element, inserted)
 for i in range(len(across)):
     clueNo  = across[i][0]
     if(len(down[i][1]) > 60):
-        part1   = "<div><text><b>"+clueNo + "</b> " +across[i][1][:60]+'_'+"</text></div>"
-        part2   = "<div><text>"+ "  " +across[i][1][60:]+"</text></div>"
+        index = across[:60].rindex(' ')
+        part1   = "<div><text><b>"+clueNo + "</b> " +across[i][1][:index]+"</text></div>"
+        part2   = "<div><text>"+ "  " +across[i][1][index:]+"</text></div>"
         script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
         driver.execute_script(script, element, part1)
         driver.execute_script(script, element, part2)
@@ -300,8 +301,9 @@ for i in range(len(across)):
     clue    = m.findCorrectClue(accrossClues, clueNo)
     clue    = clue[0].upper() + clue[1:]
     if(len(clue) > 60):
-        part1   = "<div><text><b>"+clueNo + "</b> " +clue[:60]+'_'+"</text></div>"
-        part2   = "<div><text>"+"  " +clue[60:]+"</text></div>"
+        index = clue[:60].rindex(' ')
+        part1   = "<div><text><b>"+clueNo + "</b> " +clue[:index]+"</text></div>"
+        part2   = "<div><text>"+"  " +clue[index:]+"</text></div>"
         script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
         driver.execute_script(script, element, part1)
         driver.execute_script(script, element, part2)
@@ -319,8 +321,9 @@ driver.execute_script(script, element, inserted)
 for i in range(len(down)):
     clueNo  = down[i][0]
     if(len(down[i][1]) > 60):
-        part1   = "<div><text><b>"+clueNo + "</b> " +down[i][1][:60]+'_'+"</text></div>"
-        part2   = "<div><text>"+ "  " +down[i][1][60:]+"</text></div>"
+        index = down[:60].rindex(' ')
+        part1   = "<div><text><b>"+clueNo + "</b> " +down[i][1][:index]+"</text></div>"
+        part2   = "<div><text>"+ "  " +down[i][1][index:]+"</text></div>"
         script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
         driver.execute_script(script, element, part1)
         driver.execute_script(script, element, part2)
@@ -339,8 +342,9 @@ for i in range(len(down)):
     clue    = m.findCorrectClue(downClues, clueNo)
     clue    = clue[0].upper() + clue[1:]
     if(len(clue) > 60):
-        part1   = "<div><text><b>"+clueNo + "</b> " +clue[:60]+'_'+"</text></div>"
-        part2   = "<div><text>"+ "  " +clue[60:]+"</text></div>"
+        index = clue[:60].rindex(' ')
+        part1   = "<div><text><b>"+clueNo + "</b> " +clue[:index]+"</text></div>"
+        part2   = "<div><text>"+ "  " +clue[index:]+"</text></div>"
         script  = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
         driver.execute_script(script, element, part1)
         driver.execute_script(script, element, part2)
