@@ -9,6 +9,15 @@ from datetime import datetime
 import time
 import re
 
+def pushLog( driver,logs, message ):
+    #GET THE CURRENT TIME
+    now     = datetime.now()
+    time    = now.strftime("%H:%M:%S.%f")
+
+    inserted     = "<div><h3>"+message+ "\t\t\t\t\t///"+time+"</h3></div>"
+    script       = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
+    driver.execute_script(script, logs, inserted)
+
 def tryWordnet( myWord ):
     wordnetURL      = "http://wordnetweb.princeton.edu/perl/webwn?s=" + myWord
     html_content    = requests.get(wordnetURL).text
@@ -67,28 +76,23 @@ def translate( myWord, currentAns ):
         return currentAns
     return translation.lower() + " in " + lanName.upper()
 
-def decideResult( wnResult, mrResult, dcResult):
+def decideResult( driver, logs, wnResult, mrResult, dcResult):
     resList = []
     for i in range(len(wnResult)):
         if(wnResult[i][2]   != "NODEF"):
             resList.append(wnResult[i])
+            mes = wnResult[i][1] + " is found from Wordnet"
+            pushLog(driver,logs,mes)
         elif(mrResult[i][2] != "NODEF"):
             resList.append(mrResult[i])
+            mes = mrResult[i][1] + " is found from Merriam Webster"
+            pushLog(driver,logs,mes)
         else:
             resList.append(dcResult[i])
-
+            mes = mrResult[i][1] + " is found from Dictionary"
+            pushLog(driver,logs,mes)
     return resList
 def findCorrectClue( list, littleNumber ):
-
     for i in range(len(list)):
         if(list[i][0] == littleNumber):
             return list[i][-1]
-
-def pushLog( driver,logs, message ):
-    #GET THE CURRENT TIME
-    now     = datetime.now()
-    time    = now.strftime("%H:%M:%S.%f")
-
-    inserted     = "<div><h3>"+message+ "\t\t\t\t\t///"+time+"</h3></div>"
-    script       = "arguments[0].insertAdjacentHTML('beforeend', arguments[1])"
-    driver.execute_script(script, logs, inserted)

@@ -216,8 +216,8 @@ for each in colAnswers:
 m.pushLog(driver2,logs,"Gathered alternatives for 'Down' answers")
 
 # CHOOSE AND STORE THE GENERATED CLUES
-accrossClues    = m.decideResult(wnRowResults,mrRowResults,dcRowResults)
-downClues       = m.decideResult(wnColResults,mrColResults,dcColResults)
+accrossClues    = m.decideResult(driver2, logs, wnRowResults,mrRowResults,dcRowResults)
+downClues       = m.decideResult(driver2, logs, wnColResults,mrColResults,dcColResults)
 m.pushLog(driver2,logs,"Selected regenerated clues from various sources")
 m.pushLog(driver2,logs,"based on source priorities")
 
