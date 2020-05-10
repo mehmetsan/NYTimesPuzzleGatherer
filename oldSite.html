@@ -6,22 +6,18 @@
     <title> </title>
     <style>
       .clues {
-
+        float: center;
       }
       .divL {
-        position: absolute;
-				left: 4vw;
-				top:  2vw;
+        float: left;
       }
       .divR {
-        position: absolute;
-				left: 4vw;
-				top:  22vw;
+        float: right;
       }
 			#group_name {
 				position: absolute;
-				right: 30.5vw;
-				top: 34.5vw;
+				right: 30.8vw;
+				top: calc(13.5vw *2.5);
 			}
     </style>
   </head>
@@ -33,7 +29,7 @@
             <svg
               class="board"
               preserveAspectRatio="xMidYMin meet"
-              viewBox="0 0 150.00 70.00"
+              viewBox="0 0 150.00 150.00"
             >
               <title id="boardTitle">Puzzle Board</title>
               <g id="puzzleData" data-group="cells" role="table">
@@ -46,7 +42,7 @@
               <h3>Across</h3>
               <ol id="acrossClues"></ol>
             </div>
-            <div class="divR">
+            <div class="divL">
               <h3>Down</h3>
               <ol id="downClues"></ol>
             </div>
